@@ -1,0 +1,64 @@
+---
+title: "Mixed-Effects Models"
+subtitle: "Misc. Hierarchical Examples" 
+output:
+  html_notebook:
+    toc: yes
+---
+
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+packages_needed <- c("ggplot2", # graphics
+                     "dplyr",
+                     "arm", # display() etc.
+                     "MASS",
+                     "ggfortify",
+                     "nlme",
+                     "lme4",
+                     "lmerTest",
+                     "asbio"
+                     )
+pk_to_install <- packages_needed [!( packages_needed %in% rownames(installed.packages())  )]
+if(length(pk_to_install)>0 ){
+  install.packages(pk_to_install,repos="http://cran.r-project.org")
+}
+#lapply(packages_needed, require, character.only = TRUE)
+library(ggplot2)
+library(dplyr)
+library(arm)
+library(MASS)
+library(ggfortify)
+library(nlme)
+library(lme4)
+library(lmerTest)
+library(asbio) # Aho 2014 example data
+``` 
+
+Read in data:
+```{r}
+data <- read.csv("data/great_tit_song_data.csv")
+```
+
+Plot data:
+```{r less confusing mosquito figure}
+ggplot(data, aes(cage, length, colour = as.factor(female), shape=as.factor(measures))) + 
+  geom_jitter(width =0.15, size=5) +
+  annotate("text", x = 2, y = 82.5, label = "12 females") +
+  annotate("text", x = 2, y = 80, label = "2 measures per female") +
+  annotate("text", x = 2, y = 77.5, label = "24 total measurements", size=5, color="blue")
+```
+
+run a mixed model analysis, with a hierarchical nested setup:
+```{r mosquito model2, message=FALSE, warning=FALSE}
+aedes.2 <- lmer(length ~ cage + (1|cage/female), data = mosquito)
+# aedes.wrong <- lmer(length ~ cage + (1|female), data = mosquito) 
+# this notation assumes every female is in every treatment; they are not 
+summary(aedes.2)
+```
+
+
+
+
+
+
+
