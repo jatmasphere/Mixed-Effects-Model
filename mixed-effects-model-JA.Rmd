@@ -1,3 +1,5 @@
+<body style="background-color:#c8d7c1"> 
+
 ---
 title: "Mixed-Effects Models"
 subtitle: "Misc. Hierarchical Examples" 
@@ -31,13 +33,64 @@ library(ggfortify)
 library(nlme)
 library(lme4)
 library(lmerTest)
-library(asbio) # Aho 2014 example data
+library(tidyverse)
+library(emmeans)
+library(performance)
 ``` 
 
 Read in data:
 ```{r}
-data <- read.csv("data/great_tit_song_data.csv")
+d1 <- read.csv("song.csv")
 ```
+
+```{r}
+summary <- d1 %>%
+  group_by(sex, trial) %>%
+  summarise(n = n(),
+           mean_move=mean(dist),
+           se_move=sd(dist)/sqrt(n()))
+            
+summary
+```
+
+```{r}
+mixedm <- lmer(dist~sex*trial+(1|subject), data = d1)
+#not syntax for model specification:compact syntax
+anova(mixedm) #gives us tests for fixed effects
+
+```
+```{r}
+summary(mixedm)
+
+```
+
+```{r}
+install.packages('see')
+performance::check_model(mixedm)
+```
+```{r}
+mixed_emm <- emmeans(mixedm, "trial", "sex")
+mixed_emm
+
+data_emm <- as.data.frame(summary(mixed_emm))
+#data_emm <- as.data.frame(summary(mixed_animals_emm))[c('season', 'species', 'emmean', 'SE')] #specify columns to print
+data_emm
+```
+```{r}
+data_emm$trial <- factor(data_emm$trial, levels = c("A", "B", "C"))
+
+p<- ggplot(data_emm, aes(x=trial, y=emmean, group=sex, color=sex)) + 
+  geom_line() +
+  geom_point(size=4)+
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=.2)+
+  labs(title="Distance Traveled Per Season (marginal means +/- 1 SE)", x="Season", y = "Distance Traveled (miles)")
+p
+
+```
+
+
+
+
 
 Plot data:
 ```{r less confusing mosquito figure}
@@ -62,3 +115,4 @@ summary(aedes.2)
 
 
 
+</body>

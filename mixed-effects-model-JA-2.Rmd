@@ -1,0 +1,113 @@
+<body style="background-color:#c8d7c1"> 
+
+---
+title: "Mixed-Effects Models"
+subtitle: "Misc. Hierarchical Examples" 
+output:
+  html_notebook:
+    toc: yes
+---
+
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+packages_needed <- c("ggplot2", # graphics
+                     "dplyr",
+                     "arm", # display() etc.
+                     "MASS",
+                     "ggfortify",
+                     "nlme",
+                     "lme4",
+                     "lmerTest",
+                     "asbio"
+                     )
+pk_to_install <- packages_needed [!( packages_needed %in% rownames(installed.packages())  )]
+if(length(pk_to_install)>0 ){
+  install.packages(pk_to_install,repos="http://cran.r-project.org")
+}
+#lapply(packages_needed, require, character.only = TRUE)
+library(ggplot2)
+library(dplyr)
+library(arm)
+library(MASS)
+library(ggfortify)
+library(nlme)
+library(lme4)
+library(lmerTest)
+library(tidyverse)
+library(emmeans)
+library(performance)
+``` 
+  
+<center>Dataset: Mohlman, Jessica L. et al. (2019), Data from: Nonconsumptive effects of hunting on a nontarget game bird, Dryad, [Dataset](https://doi.org/10.5061/dryad.b3k21db)</center>
+  
+<center>![Northern Bobwhite quail](images/quail2.png){width=100%}</center>
+  
+Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover, among bobwhite. 
+  
+  
+<center>![Northern Bobwhite quail](images/quail.png){width=100%}</center>
+  
+```{r, fig.align="center"}
+bobwhite <- read.csv('bobwhite3.csv')
+bobwhite$ID <- as.factor(bobwhite$ID) #make ID a factor
+p1<- ggplot(bobwhite, aes(x=HuntDay, y=HW_Dist, group=ID, color=ID, shape=ID)) + 
+  geom_point(size=4, position = position_dodge2(width=.33, preserve = "total")) +
+  scale_y_continuous() +
+  #geom_line() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title="Risk Behavior in Bobwhite During Hunting Season", x= "Hunting Season Species", y = "Distance from Hardwood Forest Cover (meters)")
+p1
+# ID: Unique ID given to each bobwhite covey tracked in chronological order.
+# HuntDay: Denotes if it was a “Rabbit” or “Quail” (bobwhite) scheduled hunt day. 
+# HW_Dist: Distance in meters a bobwhite covey was from hardwood habitat.
+```
+```{r, fig.align="center"}
+bobwhite_means <- bobwhite %>%
+  group_by(HuntDay) %>%
+  summarise(mean_HW_Dist=mean(HW_Dist),
+            se_HW_Dist=sd(HW_Dist)/sqrt(n()))
+bobwhite_means
+```
+```{r}
+mixed_bobwhite <- lmer(HW_Dist~(HuntDay*ID)+(1|ID), data = bobwhite)
+anova(mixed_bobwhite) 
+```
+```{r, include=FALSE}
+library(see)
+library(patchwork)
+```
+```{r fig.height=9, fig.align="center"}
+performance::check_model(mixed_bobwhite)
+```
+$~$
+
+
+```{r}
+
+```
+```{r}
+
+```
+
+run a mixed model analysis, with a hierarchical nested setup:
+```{r, message=FALSE, warning=FALSE}
+
+
+#ggplot(bobwhite2, aes(HuntDay, HW_Dist, colour = as.factor(ID), shape=as.factor(Treatment))) + 
+#  geom_jitter(width =0.15, size=5)
+
+#lmm_bob <- lmer(HW_Dist ~ HuntDay + (1|HuntDay/Covey_Num), data = bobwhite2)
+# aedes.wrong <- lmer(length ~ cage + (1|female), data = mosquito) 
+# this notation assumes every female is in every treatment; they are not 
+#summary(lmm_bob)
+```
+```{r}
+#anova(lmm_bob)
+```
+
+
+
+
+
+
+</body>
