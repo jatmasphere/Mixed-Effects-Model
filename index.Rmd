@@ -1,13 +1,9 @@
-<body style="background-color:#a2c9e5"> 
-
----
-title: "Mixed-Effects Models"
-subtitle: "Misc. Hierarchical Examples" 
-output:
-  html_notebook:
-    toc: yes
----
-
+<body style="background-color:#5271b0"> 
+  
+## <span style="color:white; font size:40px">Mixed-Effects Models</span>
+  
+<center><span style="color:white; font-size:25px">Repeated Measures Model</span></center>
+  
 ```{r setup2, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 packages_needed <- c("ggplot2", # graphics
@@ -37,12 +33,13 @@ library(tidyverse)
 library(emmeans)
 library(performance)
 ``` 
-  
-<center>Dataset: Mohlman, Jessica L. et al. (2019), Data from: Nonconsumptive effects of hunting on a nontarget game bird, Dryad, [Dataset](https://doi.org/10.5061/dryad.b3k21db)</center>
-  
+    
+      
+<center><span style="color:white; font size:10px">Dataset: Mohlman, Jessica L. et al. (2019), Data from: Nonconsumptive effects of hunting on a nontarget game bird, Dryad [Dataset](https://doi.org/10.5061/dryad.b3k21db)</span></center>
+    
 <center>![Northern Bobwhite quail](images/quail2.png){width=100%}</center>
-  
-Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover, among bobwhite. 
+    
+<span style="color:white; font size:10px">Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover, among bobwhite. </span>
   
   
 <center>![Northern Bobwhite quail](images/quail.png){width=100%}</center>
@@ -51,11 +48,12 @@ Disturbance through human hunting activity can significantly impact prey species
 bobwhite <- read.csv('bobwhite3.csv')
 bobwhite$ID <- as.factor(bobwhite$ID) #make ID a factor
 p1<- ggplot(bobwhite, aes(x=HuntDay, y=HW_Dist, group=ID, color=ID, shape=ID)) + 
-  geom_point(size=4, position = position_dodge2(width=.33, preserve = "total")) +
+  geom_point(size=4, alpha=0.6, position = position_dodge2(width=.33, preserve = "total")) +
   scale_y_continuous() +
   #geom_line() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title="Risk Behavior in Bobwhite During Hunting Season", x= "Hunting Season Species", y = "Distance from Hardwood Forest Cover (meters)")
+  labs(title="Risk Behavior in Bobwhite During Hunting Season", x= "Hunting Season Species", y = "Distance from Hardwood Forest Cover (meters)")+
+  theme_bw()
 p1
 # ID: Unique ID given to each bobwhite covey tracked in chronological order.
 # HuntDay: Denotes if it was a “Rabbit” or “Quail” (bobwhite) scheduled hunt day. 
@@ -71,6 +69,7 @@ bobwhite_means
 ```{r}
 mixed_bobwhite <- lmer(HW_Dist~(HuntDay*ID)+(1|ID), data = bobwhite)
 anova(mixed_bobwhite) 
+summary(mixed_bobwhite)
 ```
 ```{r, include=FALSE}
 library(see)
@@ -79,34 +78,50 @@ library(patchwork)
 ```{r fig.height=9, fig.align="center"}
 performance::check_model(mixed_bobwhite)
 ```
-$~$
-
-
-```{r}
-
+  $~$
+    $~$
+    
+  
+<center><span style="color:white; font-size:25px">Nested Hierarchical Model</span>
+  
+<center><span style="color:white; font size:10px">Dataset: Snijders, Lysanne; van Oers, Kees; Naguib, Marc (2017), Data from: Sex-specific responses to territorial intrusions in a communication network: evidence from radio-tagged great tits, Dryad [Dataset](https://doi.org/10.5061/dryad.00v20)</span></center>
+  
+![Great Tits (*Parus major*)](images/great_tits.jpeg){width=100%}
+  
+</center>
+  
+<span style="color:white; font size:10px">Advertisement signaling is usually linked to intersexual selection and intrasexual competition and thus is a key component of a species’ ecology. Using a novel spatial tracking system, the authors tested whether or not the spatial behavior of male and female great tits (*Parus major*) changes in relation to the response of a territorial male neighbor to an intruder. They tracked the spatial behavior of male and female great tits (N = 20), 1 hr before and 1 hr after simulating territory intrusions. </span>
+  
+```{r, fig.align="center"}
+tit <- read.csv("great_tits.csv")
+tit$sex <- as.factor(tit$sex)
+ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) + 
+  geom_jitter(width =0.15, size=5, alpha=0.6)+
+  ylab ("Response Distance from Playback Location (meters)") +
+  xlab ("Sex") +
+  annotate("text", x = 2, y = 76, label = "20 birds") +
+  annotate("text", x = 2, y = 72, label = "2 measurements per bird") +
+  annotate("text", x = 2, y = 67, label = "40 total measurements", size=4, color="blue")+
+  labs(title="Sex-specific Responses to Territorial Intrusions", caption="1 = female
+       2 = male")+
+  theme_bw()
 ```
-```{r}
-
-```
-
-run a mixed model analysis, with a hierarchical nested setup:
+  
+<span style="color:white; font size:10px">In this study, 20 individuals were measured 2 times, 1 hour before playback and 1 hour after. The individuals are separated by sex to look at the different distances between females and males. Distance on the Y axis is measured in meters, with distance being how many meters away a bird was detected before and after a playback recording was played of a territorial male's song.
+Based on the measurements of distance before and after playback, it looks like there isn't really a pattern of whether or not sex plays a role in an individual bird's movement after a territorial playback.</span>
+  
 ```{r, message=FALSE, warning=FALSE}
-
-
-#ggplot(bobwhite2, aes(HuntDay, HW_Dist, colour = as.factor(ID), shape=as.factor(Treatment))) + 
-#  geom_jitter(width =0.15, size=5)
-
-#lmm_bob <- lmer(HW_Dist ~ HuntDay + (1|HuntDay/Covey_Num), data = bobwhite2)
-# aedes.wrong <- lmer(length ~ cage + (1|female), data = mosquito) 
-# this notation assumes every female is in every treatment; they are not 
-#summary(lmm_bob)
+lmmtit <- lmer(dist_m ~ (1|sex/id), data = tit)
+lmmtit2 <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
+summary(lmmtit2)
 ```
 ```{r}
-#anova(lmm_bob)
+anova(lm(dist_m ~ sex/id, data = tit))
+
 ```
 
 
-
+<center>![](images/great_tits2.png){width=100%}</center>
 
 
 
