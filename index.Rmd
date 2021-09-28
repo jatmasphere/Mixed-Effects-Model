@@ -149,7 +149,7 @@ lmmtit <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
 summary(lmmtit)
 ```
 
-<span style="color:white; font size:13px">Using a linear mixed model to see if there's an interaction between the sex of the bird and distance of detection, Because the design is perfectly balanced, we can obtain the variance component estimates using mean squares from a conventional ANOVA. But this is confusing because df are different than what we might expect (there were only 12 mosquitos in the experiment).</span>
+<span style="color:white; font size:13px">Using a linear mixed model to see if there's an interaction between the sex of the bird and distance of detection.</span>
 
 
 ```{r}
