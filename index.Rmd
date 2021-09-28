@@ -61,6 +61,35 @@ p1
 # HuntDay: Denotes if it was a “Rabbit” or “Quail” (bobwhite) scheduled hunt day. 
 # HW_Dist: Distance in meters a bobwhite covey was from hardwood habitat.
 ```
+```{r}
+mixed_bobwhite <- lmer(HW_Dist~(HuntDay*ID)+(1|ID), data = bobwhite)
+anova(mixed_bobwhite) 
+```
+  
+<span style="color:white; font size:13px">
+Looking at all of the possible interactive effects, we can see that the only statistically significant effect is the interaction of hunting season day and how close the covey stayed in the shelter of hardwood forest. 
+</span>
+
+```{r}
+summary(mixed_bobwhite)
+```
+  
+  
+<span style="color:white; font size:13px">
+We can check our model using the Performance package:
+</span>
+  
+```{r, include=FALSE}
+library(see)
+library(patchwork)
+```
+```{r fig.height=9, fig.align="center"}
+performance::check_model(mixed_bobwhite)
+```
+  
+  <span style="color:white; font size:13px">
+There is an unequal number of points per day for each individual covey, which makes our study unbalanced. We can check the accuracy of this model and account for this by using emmeans:
+  </span>
 ```{r, fig.align="center"}
 bobwhite_means <- bobwhite %>%
   group_by(HuntDay) %>%
@@ -69,31 +98,13 @@ bobwhite_means <- bobwhite %>%
 bobwhite_means
 ```
 ```{r}
-mixed_bobwhite <- lmer(HW_Dist~(HuntDay*ID)+(1|ID), data = bobwhite)
-anova(mixed_bobwhite) 
-```
-```{r, include=FALSE}
-library(see)
-library(patchwork)
-```
-```{r fig.height=9, fig.align="center"}
-performance::check_model(mixed_bobwhite)
-```
-```{r}
 bob_means <- emmeans(mixed_bobwhite, "HuntDay")
 bob_means
 ```
 
-<span style="color:white; font size:13px">
-Because there is an unequal number of points per day for each individual covey, we can check the accuracy of this model by using emmeans:
-</span>
 ```{r}
 em_bob <- as.data.frame(bob_means)
 em_bob
-```
-
-```{r}
-bobwhite_means
 ```
 
 ```{r, fig.align="center"}
@@ -109,8 +120,13 @@ ggplot(em_bob, aes(x=HuntDay, y=emmean)) +
   theme_bw()+
   labs(title="Comparing raw means to emmeans", caption="Light blue = raw means, Dark blue = adjusted means", x= "Hunting Day (1=Quail, 2=Rabbit)", y = "Average distance from hardwood cover (m)") 
 ```
+<span style="color:white; font size:13px">
+We can see that the raw means and the adjusted emmeans don't differ much, which lets us know that our model works for this analysis without having to account for the unbalanced points.
+</span>
+  
   $~$
-    $~$
+  
+  $~$
     
   
 <center><span style="color:white; font-size:25px">Nested Hierarchical Model</span>
@@ -144,20 +160,21 @@ ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) 
 <span style="color:white; font size:13px">In this study, 13 individuals were measured 2 times, 1 hour before playback and 1 hour after. The individuals are separated by sex to look at the different distances between females and males. Distance on the Y axis is measured in meters, with distance being how many meters away a bird was detected before and after a playback recording was played of a territorial male's song.
 Based on the measurements of distance before and after playback, it looks like there isn't really a pattern of whether or not sex plays a role in an individual bird's movement after a territorial playback.</span>
   
+<span style="color:white; font size:13px">Using a linear mixed model to see if there's an interaction between the sex of the bird and distance of detection:</span>
+  
+  
 ```{r, message=FALSE, warning=FALSE}
-lmmtit <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
+lmmtit <- lmer(dist_m ~ (1|sex/id), data = tit)
 summary(lmmtit)
 ```
 
-<span style="color:white; font size:13px">Using a linear mixed model to see if there's an interaction between the sex of the bird and distance of detection.</span>
-
-
 ```{r}
 anova(lm(dist_m ~ sex/id, data = tit))
-
 ```
-
-
+  
+<span style="color:white; font size:13px">Our p-values are not reading as statistically significant, which matches what we can see in the plot. What this can be interpreted as is that there is not a significant interaction between sex of the bird and the distance it can be detected before or after a territorial playback is used. </span>
+  
+  
 <center>![](images/great_tits2.png){width=100%}</center>
 $~$
 $~$  
