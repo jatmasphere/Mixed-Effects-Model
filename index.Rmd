@@ -32,6 +32,7 @@ library(lmerTest)
 library(tidyverse)
 library(emmeans)
 library(performance)
+library(RColorBrewer)
 ``` 
     
       
@@ -52,8 +53,9 @@ p1<- ggplot(bobwhite, aes(x=HuntDay, y=HW_Dist, group=ID, color=ID, shape=ID)) +
   scale_y_continuous() +
   #geom_line() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title="Risk Behavior in Bobwhite During Hunting Season", x= "Hunting Season Species", y = "Distance from Hardwood Forest Cover (meters)")+
-  theme_bw()
+  labs(title="Risk Behavior in Bobwhite During Hunting Season", x= "Hunting Season Species", y = "Distance from Hardwood Forest Cover (meters)")+ 
+  theme_bw()+
+  scale_color_brewer(palette = "BrBG")
 p1
 # ID: Unique ID given to each bobwhite covey tracked in chronological order.
 # HuntDay: Denotes if it was a “Rabbit” or “Quail” (bobwhite) scheduled hunt day. 
@@ -69,7 +71,6 @@ bobwhite_means
 ```{r}
 mixed_bobwhite <- lmer(HW_Dist~(HuntDay*ID)+(1|ID), data = bobwhite)
 anova(mixed_bobwhite) 
-summary(mixed_bobwhite)
 ```
 ```{r, include=FALSE}
 library(see)
@@ -77,6 +78,34 @@ library(patchwork)
 ```
 ```{r fig.height=9, fig.align="center"}
 performance::check_model(mixed_bobwhite)
+```
+```{r}
+bob_means <- emmeans(mixed_bobwhite, "HuntDay")
+bob_means
+```
+
+Because there is an unequal number of points per day for each individual, we can check the accuracy of this model by using emmeans:
+```{r}
+em_bob <- as.data.frame(bob_means)
+em_bob
+```
+
+```{r}
+bobwhite_means
+```
+
+```{r, fig.align=center}
+em_bob$HuntDay <- factor(em_bob$HuntDay, levels= c("Quail","Rabbit"))
+
+ggplot(em_bob, aes(x=HuntDay, y=emmean)) + 
+  geom_point(size=5, color="#CCFFCC") +
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=.2, color="#6699CC") +
+  geom_point(size=5, data=bobwhite_means, x=bobwhite_means$HuntDay, y=bobwhite_means$mean_HW_Dist, color = "#336699") +
+  theme(axis.text.x = ggtext::element_markdown(color = "tan4", size = 12)) +
+  scale_x_discrete(labels = labels) +
+  theme(plot.caption=element_text(size=9, hjust=0, margin=margin(15,0,0,0)))+
+  theme_bw()+
+  labs(title="Comparing raw means to emmeans", subtitle="Light blue: raw means, Dark blue: adjusted means", x= "Hunting Day (1=Quail, 2=Rabbit)", y = "Average distance from hardwood cover (m)") 
 ```
   $~$
     $~$
@@ -104,6 +133,8 @@ ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) 
   annotate("text", x = 2, y = 67, label = "40 total measurements", size=4, color="blue")+
   labs(title="Sex-specific Responses to Territorial Intrusions", caption="1 = female
        2 = male")+
+  scale_shape_discrete(name= "Measurements 
+  Before / After")+
   theme_bw()
 ```
   
@@ -111,9 +142,8 @@ ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) 
 Based on the measurements of distance before and after playback, it looks like there isn't really a pattern of whether or not sex plays a role in an individual bird's movement after a territorial playback.</span>
   
 ```{r, message=FALSE, warning=FALSE}
-lmmtit <- lmer(dist_m ~ (1|sex/id), data = tit)
-lmmtit2 <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
-summary(lmmtit2)
+lmmtit <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
+summary(lmmtit)
 ```
 ```{r}
 anova(lm(dist_m ~ sex/id, data = tit))
@@ -122,7 +152,6 @@ anova(lm(dist_m ~ sex/id, data = tit))
 
 
 <center>![](images/great_tits2.png){width=100%}</center>
-
-
+$~$
 
 </body>
