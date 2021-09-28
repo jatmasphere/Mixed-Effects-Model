@@ -38,7 +38,7 @@ library(RColorBrewer)
       
 <center><span style="color:white; font size:10px">Dataset: Mohlman, Jessica L. et al. (2019), Data from: Nonconsumptive effects of hunting on a nontarget game bird, Dryad [Dataset](https://doi.org/10.5061/dryad.b3k21db)</span></center>
     
-<center>![Northern Bobwhite quail](images/quail2.png){width=100%}</center>
+<center>![Northern Bobwhite quail](images/quail2.png){width=90%}</center>
     
 <span style="color:white; font size:10px">Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover, among bobwhite. </span>
   
@@ -94,7 +94,7 @@ em_bob
 bobwhite_means
 ```
 
-```{r, fig.align=center}
+```{r, fig.align="center"}
 em_bob$HuntDay <- factor(em_bob$HuntDay, levels= c("Quail","Rabbit"))
 
 ggplot(em_bob, aes(x=HuntDay, y=emmean)) + 
