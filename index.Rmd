@@ -1,4 +1,4 @@
-<body style="background-color:#5271b0"> 
+<body style="background-color:#395b6e"> 
   
 ## <span style="color:white; font size:40px">Mixed-Effects Models</span>
   
@@ -40,7 +40,7 @@ library(RColorBrewer)
     
 <center>![Northern Bobwhite quail](images/quail2.png){width=90%}</center>
     
-<span style="color:white; font size:10px">Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover, among bobwhite. </span>
+<span style="color:white; font size:13px">Disturbance through human hunting activity can significantly impact prey species through both consumptive and nonconsumptive effects. The nonconsumptive effects of rabbit hunting on Northern Bobwhite (*Colinus virginianus*; hereafter, bobwhite) could cause an increased perceived risk of predation by bobwhite during rabbit hunting events may elicit anti-predator responses, such as reduced movement away from the safety of cover. </span>
   
   
 <center>![Northern Bobwhite quail](images/quail.png){width=100%}</center>
@@ -84,7 +84,9 @@ bob_means <- emmeans(mixed_bobwhite, "HuntDay")
 bob_means
 ```
 
-Because there is an unequal number of points per day for each individual, we can check the accuracy of this model by using emmeans:
+<span style="color:white; font size:13px">
+Because there is an unequal number of points per day for each individual covey, we can check the accuracy of this model by using emmeans:
+</span>
 ```{r}
 em_bob <- as.data.frame(bob_means)
 em_bob
@@ -98,14 +100,14 @@ bobwhite_means
 em_bob$HuntDay <- factor(em_bob$HuntDay, levels= c("Quail","Rabbit"))
 
 ggplot(em_bob, aes(x=HuntDay, y=emmean)) + 
-  geom_point(size=5, color="#CCFFCC") +
+  geom_point(size=5, color="#87b8d3") +
   geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=.2, color="#6699CC") +
   geom_point(size=5, data=bobwhite_means, x=bobwhite_means$HuntDay, y=bobwhite_means$mean_HW_Dist, color = "#336699") +
   theme(axis.text.x = ggtext::element_markdown(color = "tan4", size = 12)) +
   scale_x_discrete(labels = labels) +
   theme(plot.caption=element_text(size=9, hjust=0, margin=margin(15,0,0,0)))+
   theme_bw()+
-  labs(title="Comparing raw means to emmeans", subtitle="Light blue: raw means, Dark blue: adjusted means", x= "Hunting Day (1=Quail, 2=Rabbit)", y = "Average distance from hardwood cover (m)") 
+  labs(title="Comparing raw means to emmeans", caption="Light blue = raw means, Dark blue = adjusted means", x= "Hunting Day (1=Quail, 2=Rabbit)", y = "Average distance from hardwood cover (m)") 
 ```
   $~$
     $~$
@@ -113,13 +115,14 @@ ggplot(em_bob, aes(x=HuntDay, y=emmean)) +
   
 <center><span style="color:white; font-size:25px">Nested Hierarchical Model</span>
   
-<center><span style="color:white; font size:10px">Dataset: Snijders, Lysanne; van Oers, Kees; Naguib, Marc (2017), Data from: Sex-specific responses to territorial intrusions in a communication network: evidence from radio-tagged great tits, Dryad [Dataset](https://doi.org/10.5061/dryad.00v20)</span></center>
+<center><span style="color:white; font size:13px">Dataset: Snijders, Lysanne; van Oers, Kees; Naguib, Marc (2017), Data from: Sex-specific responses to territorial intrusions in a communication network: evidence from radio-tagged great tits, Dryad [Dataset](https://doi.org/10.5061/dryad.00v20)</span></center>
   
 ![Great Tits (*Parus major*)](images/great_tits.jpeg){width=100%}
   
 </center>
   
-<span style="color:white; font size:10px">Advertisement signaling is usually linked to intersexual selection and intrasexual competition and thus is a key component of a species’ ecology. Using a novel spatial tracking system, the authors tested whether or not the spatial behavior of male and female great tits (*Parus major*) changes in relation to the response of a territorial male neighbor to an intruder. They tracked the spatial behavior of male and female great tits (N = 20), 1 hr before and 1 hr after simulating territory intrusions. </span>
+<span style="color:white; font size:13px">Advertisement signaling is usually linked to intersexual selection and intrasexual competition and thus is a key component of a species’ ecology. Using a novel spatial tracking system, the authors tested whether or not the spatial behavior of male and female great tits (*Parus major*) changes in relation to the response of a territorial male neighbor to an intruder. They tracked the spatial behavior of male and female great tits (N = 13), 1 hr before and 1 hr after simulating territory intrusions.
+The individual bird is a random effect, and the sex of the bird and measurements taken before and after are fixed effects.</span>
   
 ```{r, fig.align="center"}
 tit <- read.csv("great_tits.csv")
@@ -128,9 +131,9 @@ ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) 
   geom_jitter(width =0.15, size=5, alpha=0.6)+
   ylab ("Response Distance from Playback Location (meters)") +
   xlab ("Sex") +
-  annotate("text", x = 2, y = 76, label = "20 birds") +
+  annotate("text", x = 2, y = 76, label = "13 birds") +
   annotate("text", x = 2, y = 72, label = "2 measurements per bird") +
-  annotate("text", x = 2, y = 67, label = "40 total measurements", size=4, color="blue")+
+  annotate("text", x = 2, y = 67, label = "26 total measurements", size=4, color="blue")+
   labs(title="Sex-specific Responses to Territorial Intrusions", caption="1 = female
        2 = male")+
   scale_shape_discrete(name= "Measurements 
@@ -138,13 +141,17 @@ ggplot(tit, aes(sex, dist_m, colour = as.factor(id), shape=as.factor(measure))) 
   theme_bw()
 ```
   
-<span style="color:white; font size:10px">In this study, 20 individuals were measured 2 times, 1 hour before playback and 1 hour after. The individuals are separated by sex to look at the different distances between females and males. Distance on the Y axis is measured in meters, with distance being how many meters away a bird was detected before and after a playback recording was played of a territorial male's song.
+<span style="color:white; font size:13px">In this study, 13 individuals were measured 2 times, 1 hour before playback and 1 hour after. The individuals are separated by sex to look at the different distances between females and males. Distance on the Y axis is measured in meters, with distance being how many meters away a bird was detected before and after a playback recording was played of a territorial male's song.
 Based on the measurements of distance before and after playback, it looks like there isn't really a pattern of whether or not sex plays a role in an individual bird's movement after a territorial playback.</span>
   
 ```{r, message=FALSE, warning=FALSE}
 lmmtit <- lmer(dist_m ~ sex + (1|sex/id), data = tit)
 summary(lmmtit)
 ```
+
+<span style="color:white; font size:13px">Using a linear mixed model to see if there's an interaction between the sex of the bird and distance of detection, Because the design is perfectly balanced, we can obtain the variance component estimates using mean squares from a conventional ANOVA. But this is confusing because df are different than what we might expect (there were only 12 mosquitos in the experiment).</span>
+
+
 ```{r}
 anova(lm(dist_m ~ sex/id, data = tit))
 
@@ -153,5 +160,5 @@ anova(lm(dist_m ~ sex/id, data = tit))
 
 <center>![](images/great_tits2.png){width=100%}</center>
 $~$
-
+$~$  
 </body>
